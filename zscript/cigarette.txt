@@ -1,0 +1,254 @@
+
+Class Cigarette : Weapon
+{
+	Int ready_state;
+	Int heal_tick;
+
+ 	Default
+	{
+		+WEAPON.WIMPY_WEAPON;		
+		+WEAPON.MELEEWEAPON;
+		+WEAPON.NOALERT;
+		Weapon.SelectionOrder 9999;
+		Obituary "Cigarette";
+		Inventory.Pickupmessage "";
+		Tag "Cigarette";
+	}
+	
+	override void tick()
+	{
+		if(!owner)
+		{
+			self.destroy();
+			return;
+		}
+		
+		heal_tick++;
+		
+		let CameraPos = owner.player.camera.pos;
+		let MainhandPos = MainHandTracker(owner.player.mo.FindInventory("MainHandTracker")).AttackPos;
+		let zbump = (owner.height - owner.player.viewheight) / 2;
+		Vector3 dhm = CameraPos - MainhandPos;
+		if(abs(dhm.x) < 2 && abs(dhm.y) && abs(dhm.y + zbump))
+		{
+			ready_state = 1;
+		}
+		else
+		{
+			
+			ready_state = 0;
+		}
+	}
+	
+	Action void A_RemoveSelf()
+	{
+		let self_actor = invoker.owner.player.mo.FindInventory("Cigarette");
+		self_actor.destroy();
+	}
+	
+	Action void A_CalmDown()
+	{
+		let player_health = invoker.owner.health;
+		
+		if(player_health < 35 && invoker.heal_tick % 105 == 0)
+		{
+			invoker.owner.A_SetHealth(player_health + 1);
+		}
+	}
+	
+	States
+	{
+	Ready:
+		CIGA AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 1 A_WeaponReady(WRF_ALLOWZOOM);
+		CIGA AAAAAAAAAAAAAAAAAAA 1 A_WeaponReady(WRF_ALLOWZOOM);
+	ReadyLit:
+		CIGA BBBBBBBBBB 1 A_WeaponReady(WRF_ALLOWZOOM);
+		"####" # 0 A_JumpIf(invoker.ready_state == 1, "ReadySmoke");
+		"####" # 0 A_FireProjectile("CigSmokeSpawner");
+		Loop;
+	ReadySmoke:
+		CIGA B 1 A_WeaponReady(WRF_ALLOWZOOM);
+		"####" # 0 A_Print("Smoking...");
+		"####" # 0 A_FireProjectile("CigSmokeSpawner");
+		"####" # 0 A_CalmDown();
+		"####" # 0 A_JumpIf(invoker.ready_state == 0, "ReadyLit");
+		Loop;
+	Deselect:
+		CIGA B 1 A_Lower(60);
+		Loop;
+	Select:
+		CIGA A 1 A_Raise(60);
+		Loop;
+	Fire:
+	Melee:
+		CIGA B 4 A_FireProjectile("Cigarette_Butt", 0, 0);
+		CIGA B 0 A_RemoveSelf();
+		Goto Ready;
+	Zoom:
+	User4:
+		CIGA A 0 A_RemoveSelf();
+		Stop;
+ 	Spawn:
+		TNT1 A -1;
+		Stop;
+	}
+}
+
+Class CigSmokeSpawner : Actor
+{
+	Default
+	{
+	Radius 1;
+	Height 1;
+	Speed 0;
+	Damage 0;
+	Projectile;
+	}
+	
+	States
+	{
+	Spawn:
+		TNT1 A 0;
+		TNT1 A 1 A_SpawnItemEx("Cigarette_Smoke",4,frandom(0.1,-0.1),0,0,0,frandom(0.5,0.1),0,SXF_CLIENTSIDE,0);
+		Stop;
+	}
+}
+
+Class Cigarette_Butt : Actor
+{
+	Default
+	{
+	Projectile;
+	+MISSILE
+	-NOGRAVITY
+	-BLOODSPLATTER
+	-EXTREMEDEATH
+	+EXPLODEONWATER
+	+SKYEXPLODE
+	+BOUNCEONFLOORS
+	+BOUNCEONWALLS
+	+BOUNCEONCEILINGS
+	+NOTELEPORT
+	+THRUSPECIES
+	+RANDOMIZE
+	
+	Radius 2;
+	Height 1;
+	Scale 0.3;
+	Speed 12;
+	Damage 1;
+	BounceFactor 0.5;
+	WallBounceFactor 0.25;
+	BounceType "Doom";
+	Gravity 0.5;
+	Health 60;
+	}
+	States
+	{
+	Spawn:
+		CIGA A 0;
+		CIGA A 0 A_SetAngle(random(0,7) * 45);
+		CIGA AAAAAAAA 2 A_SpawnItemEx("Cigarette_Smoke",2,frandom(0.1,-0.1),0,0,0,frandom(0.5,0.1),0,SXF_CLIENTSIDE,0);
+		Loop;
+	Death:
+		TNT1 A 0 A_SpawnItem("Cigarette_Grounded");
+		Stop;
+	}
+}
+
+Class Cigarette_Grounded : Actor
+{
+	Int countdown;
+
+	Default
+	{
+	+SHOOTABLE
+	+NOBLOOD
+	-BLOODSPLATTER
+	-EXTREMEDEATH
+	-NOBLOCKMAP
+	+NOTARGETSWITCH
+	+FRIENDLY
+	-COUNTKILL
+	+NOTELEPORT
+	
+	Radius 2;
+	Height 1;
+	Scale 0.4;
+	Mass 999999;
+	Health 60;
+	Gravity 0.7;
+	}
+	
+	override void BeginPlay()
+	{
+		countdown = 35 * random(10, 30);
+	}
+	
+	override void Tick()
+	{
+		if(countdown > 0)
+			countdown--;		
+		else
+			SetStateLabel("FadeOut");
+
+		Super.Tick();
+	}
+	
+	States
+	{
+	Spawn:
+		CIGA A 0;
+		CIGA A 0 A_SetAngle(random(0,7) * 45);
+	Idle:
+		"####" # 2 A_SpawnItemEx("Cigarette_Smoke",2,frandom(0.1,-0.1),0,0,0,frandom(0.5,0.1),0,SXF_CLIENTSIDE,0);
+		"####" # 0 A_AlertMonsters(200, AMF_TARGETEMITTER|AMF_TARGETNONPLAYER);
+		Loop;
+	Crush:
+	Death:
+	FadeOut:
+		"####" # 0 A_NoBlocking;
+		"####" # 1 A_FadeOut(0.1);
+		Wait;
+	}
+}
+
+Class Cigarette_Smoke : Actor
+{
+	Default
+	{
+	+NoInteraction;
+	+ForceXYBillboard;
+	+NoTimeFreeze;
+	Alpha 0.0;
+	RenderStyle "Translucent";
+	}
+	
+	States
+	{
+		Spawn:
+			TNT1 A 0 NoDelay A_Jump(255, "FrameA", "FrameB", "FrameC", "FrameD");
+		FrameA:
+			CSMK E 0 A_Jump(255, "FadeIn");
+			Goto FrameA;
+		FrameB:
+			CSMK F 0 A_Jump(255, "FadeIn");
+			Goto FrameB;
+		FrameC:
+			CSMK G 0 A_Jump(255, "FadeIn");
+			Goto FrameC;
+		FrameD:
+			CSMK H 0 A_Jump(255, "FadeIn");
+			Goto FrameD;
+		FadeIn:
+			"####" "#" 0 A_SetScale(FRandom(0.03, 0.015));
+			"####" "#" 1 A_FadeIn(FRandom(0.02, 0.03));
+			"####" "#" 0 A_JumpIf(Alpha >= 0.2, "FadeOut");
+			Loop;
+		FadeOut:
+			"####" "#" 1 A_FadeOut(FRandom(0.004,0.003));
+			"####" "#" 0 A_SetScale(ScaleX - 0.0002, ScaleY - 0.00005);
+			"####" "#" 0 A_JumpIf(Alpha <= 0,"NULL");
+			Loop;
+	}
+}

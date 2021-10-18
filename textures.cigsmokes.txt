@@ -1,0 +1,38 @@
+
+Sprite "CSMKA0B0", 256, 256
+{
+	Offset 128, 128
+	Patch "CIGSMK", 0, 0
+	{
+		Blend "#3A3F47"
+	}
+}
+
+Sprite "CSMKC0D0", 256, 256
+{
+	Offset 128, 128
+	Patch "CIGSMK", 0, 0
+	{
+		FlipY
+		Blend "#3A3C49"
+	}
+}
+
+Sprite "CSMKE0F0", 256, 256
+{
+	Offset 128, 128
+	Patch "CIGSMK", 0, 0
+	{
+		Blend "#E8E9EA"
+	}
+}
+
+Sprite "CSMKG0H0", 256, 256
+{
+	Offset 128, 128
+	Patch "CIGSMK", 0, 0
+	{
+		FlipY
+		Blend "#D8DCE0"
+	}
+}

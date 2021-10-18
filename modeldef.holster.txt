@@ -1,0 +1,16 @@
+
+Model Holster_Ring
+{
+	Path "models"
+	Model 0 "holster_ring.md3"
+	Skin 0 "holster_cyan.png"
+
+	Scale 1.0 1.0 1.0
+	Offset 0.0 0.0 0.0
+
+	FrameIndex HLST A 0 0
+	
+	Skin 0 "holster_green.png"
+	Scale 1.2 1.2 1.2
+	FrameIndex HLST B 0 0
+}

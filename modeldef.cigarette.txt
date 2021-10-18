@@ -1,0 +1,38 @@
+
+Model Cigarette
+{
+	Path "Models/cigarette"
+	Model 0 "cigarette.md3"
+	Skin 0 "cigarette.png"
+	
+	Scale 1.5 1.5 1.5
+	Offset 0.0 -30.0 -8.0
+	
+	FrameIndex CIGA A 0 0
+	Skin 0 "cigarette_lit.png"
+	FrameIndex CIGA B 0 0
+}
+
+Model Cigarette_Butt
+{
+	Path "Models/cigarette"
+	Model 0 "cigarette_butt.md3"
+	Skin 0 "cigarette_lit.png"
+	
+	Scale 1.5 1.5 1.5
+	Offset 0.0 0.0 0.0
+	
+	FrameIndex CIGA A 0 0
+}
+
+Model Cigarette_Grounded
+{
+	Path "Models/cigarette"
+	Model 0 "cigarette_butt.md3"
+	Skin 0 "cigarette_lit.png"
+	
+	Scale 1.5 1.5 1.5
+	Offset 0.0 0.0 0.0
+	
+	FrameIndex CIGA A 0 0
+}

@@ -1,0 +1,11 @@
+
+server bool vvest_hide_slots = false;
+server bool vvest_show_holsters = true;
+server bool vvest_show_weapons = true;
+server int vvest_left_holster_model = 0;
+server int vvest_right_holster_model = 0;
+server int vvest_assaultgun_model = 0;
+server bool vvest_cig_slot = true;
+server bool vvest_grenade_slot = true;
+server bool vvest_messages = true;
+server bool vvest_automatch_models = true;

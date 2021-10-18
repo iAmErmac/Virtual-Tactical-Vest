@@ -1,0 +1,841 @@
+/****************************************************************
+
+		VR weapon holster
+		Should work in both GZDoomVR and QuestZDoom
+		Author: Ermac (https://github.com/iAmErmac)
+		
+		You can modify and use this script in your mod
+		Just leave this comment at the top of the sript
+		and give me credit please
+		
+****************************************************************/
+
+Class VRTacticalVestControl : EventHandler
+{
+	override void PlayerEntered(PlayerEvent e)
+	{
+		let pmo = players[e.PlayerNumber].mo;
+		pmo.SetInventory("VRTacticalVestController", 1, false);
+	}
+}
+
+Class VRTacticalVestController : CustomInventory
+{
+	Actor left_holster_ring;
+	Actor right_holster_ring;
+	Actor left_holster_weapon;
+	Actor right_holster_weapon;
+	Actor assault_weapon;
+	Actor vest_rifle_slot;
+	Actor vest_cig_pack;
+	Actor vest_cig_slot;
+	Actor vest_grenade_slot;
+	Array<String> slot2_weapons;
+	Array<String> slot3_weapons;
+	Array<String> slot4_weapons;
+	String grenades;
+	
+	Vector3 LeftHolsterPos;
+	Actor LeftHolsterItem;
+	String LeftHolsterPickup;
+	
+	Vector3 RightHolsterPos;
+	Actor RightHolsterItem;
+	String RightHolsterPickup;
+	
+	Vector3 LeftShoulderPos;
+	Actor LeftShoulderItem;
+	String LeftShoulderPickup;
+	
+	Vector3 RightShoulderPos;
+	Actor RightShoulderItem;
+	String RightShoulderPickup;
+	
+	Vector3 vest_pos_rifle;
+	Actor AssaultGunItem;
+	String AssaultGunPickup;
+	
+	Vector3 vest_pos_cig;
+	
+	Vector3 vest_pos_grenade;
+	Actor GrenadeItem;
+
+	Default
+	{
+		Inventory.MaxAmount 1;
+		+INVENTORY.UNDROPPABLE;
+		+INVENTORY.UNTOSSABLE;
+		+INVENTORY.AUTOACTIVATE;
+	}
+	
+	override void DoEffect()
+	{
+		if(!owner || owner.health < 0)
+		{
+			if(left_holster_ring) left_holster_ring.destroy();
+			if(right_holster_ring) right_holster_ring.destroy();
+			if(left_holster_weapon) left_holster_weapon.destroy();
+			if(right_holster_weapon) right_holster_weapon.destroy();
+			if(assault_weapon) assault_weapon.destroy();
+			if(vest_rifle_slot) vest_rifle_slot.destroy();
+			if(vest_cig_pack) vest_cig_pack.destroy();
+			if(vest_cig_slot) vest_cig_slot.destroy();
+			if(vest_grenade_slot) vest_grenade_slot.destroy();
+			if(GrenadeItem) GrenadeItem.destroy();
+			return;
+		}
+		
+		//Get a list of compatible weapons for the slots
+		FindVestWeapons();
+		
+		Let pmo = owner.player.mo;
+		let AttackPos = MainHandTracker(pmo.FindInventory("MainHandTracker")).AttackPos;
+		let zbump = (owner.height - owner.player.viewheight) / 2;
+		let current_weapon = owner.player.ReadyWeapon;
+		String current_weapon_class;
+		if(owner.player.ReadyWeapon) current_weapon_class = owner.player.ReadyWeapon.GetClassName();
+		
+		/*
+		//Hand orientation check for QuestZDoom
+		let vr_controller_scheme = CVar.GetCVar("vr_control_scheme", players[consolePlayer]);
+		Int hand_orientation;
+		if(vr_controller_scheme != NULL)
+			hand_orientation = vr_controller_scheme.GetInt();
+		else
+			hand_orientation = 0;
+		*/
+		
+		//hoster offsets
+		LeftHolsterPos = pmo.Vec3Angle(8, pmo.angle + 90, (pmo.height / 2) - zbump, true);
+		RightHolsterPos = pmo.Vec3Angle(8, pmo.angle - 90, (pmo.height / 2) - zbump, true);
+		
+		//shoulder offsets
+		LeftShoulderPos = pmo.Vec3Angle(8.5, pmo.angle + 110, owner.player.viewheight - zbump, true);
+		RightShoulderPos = pmo.Vec3Angle(8.5, pmo.angle - 110, owner.player.viewheight - zbump, true);
+		
+		//vest offsets
+		vest_pos_rifle = pmo.Vec3Angle(1, pmo.angle, (pmo.height / 2) + 2, true);
+		vest_pos_cig = pmo.Vec3Angle(4, pmo.angle + 85, (pmo.height / 2) + 3, true);
+		vest_pos_grenade = pmo.Vec3Angle(4, pmo.angle - 80, (pmo.height / 2) - 3, true);
+		
+		//Spawn left holster
+		
+		if(!left_holster_ring)
+		{
+			if(!vvest_show_holsters)
+			{
+				if(vvest_hide_slots)
+					left_holster_ring = Actor.Spawn("PlaceHolder_Sphere", LeftHolsterPos);
+				else
+					left_holster_ring = Actor.Spawn("PlaceHolder_Sphere2", LeftHolsterPos);
+			}
+			else
+				left_holster_ring = Actor.Spawn("holster_ring", LeftHolsterPos);
+		}
+		left_holster_ring.master = self;
+		left_holster_ring.A_SetAngle(pmo.angle, 0);
+		left_holster_ring.SetOrigin(LeftHolsterPos, true);
+		
+		//Show dummy weapon model when slot in use
+		
+		if(LeftHolsterItem && vvest_show_weapons)
+		{
+			if(!left_holster_weapon)
+			{
+				switch(vvest_left_holster_model)
+				{
+					case 1:
+						left_holster_weapon = Actor.Spawn("PlaceHolder_SMG", LeftHolsterPos);
+						break;
+					case 2:
+						left_holster_weapon = Actor.Spawn("PlaceHolder_Knife", LeftHolsterPos);
+						break;
+					case 3:
+						left_holster_weapon = Actor.Spawn("PlaceHolder_Machete", LeftHolsterPos);
+						break;
+					default:
+						left_holster_weapon = Actor.Spawn("PlaceHolder_Pistol", LeftHolsterPos);
+						break;
+				}
+			}
+			left_holster_weapon.A_SetAngle(pmo.Angle);
+			left_holster_weapon.SetOrigin(LeftHolsterPos, true);
+		}
+		
+		//checking proximity of the left holster with main hand position
+		
+		Vector3 dlm = LeftHolsterPos - AttackPos;
+		if(abs(dlm.x) < 3 && abs(dlm.y) < 3 && abs(dlm.z) < 3)
+		{
+			left_holster_ring.SetStateLabel("Highlight");
+			
+			if(vvest_messages)
+			{
+				if(LeftHolsterItem)
+					pmo.A_Print(string.format("Grab %s", LeftHolsterItem.GetTag()));
+				else
+					pmo.A_Print("Left holster");
+			}
+			
+			if(LeftHolsterItem && ((owner.player.cmd.buttons & BT_ZOOM) || (owner.player.cmd.buttons & BT_USER4)))
+			{
+				if(left_holster_weapon) left_holster_weapon.destroy();
+				LeftHolsterItem = null;
+				LeftHolsterPickup = "";
+			}
+			
+			if(!LeftHolsterItem && (owner.player.cmd.buttons & BT_USE))
+			{
+				if(Slot2Weapon() && CurrentWeaponAllowed())
+				{
+					LeftHolsterItem = current_weapon;
+					LeftHolsterPickup = current_weapon_class;
+					if(vvest_automatch_models) TryAutoMatchWeaponModel('holster_left');
+				}
+			}
+			else if(LeftHolsterItem && owner.player.cmd.buttons & BT_USE)
+			{
+				owner.player.pendingWeapon = Weapon(pmo.FindInventory(LeftHolsterPickup));
+			}
+		}
+		else
+		{
+			left_holster_ring.SetStateLabel("Idle");
+		}
+		
+		//Spawn right holster
+		
+		if(!right_holster_ring)
+		{
+			if(!vvest_show_holsters)
+			{
+				if(vvest_hide_slots)
+					right_holster_ring = Actor.Spawn("PlaceHolder_Sphere", RightHolsterPos);
+				else
+					right_holster_ring = Actor.Spawn("PlaceHolder_Sphere2", RightHolsterPos);
+			}
+			else
+				right_holster_ring = Actor.Spawn("holster_ring", RightHolsterPos);
+		}
+		right_holster_ring.master = self;
+		right_holster_ring.A_SetAngle(pmo.angle, 0);
+		right_holster_ring.SetOrigin(RightHolsterPos, true);
+		
+		//Show dummy weapon model when slot in use
+		
+		if(RightHolsterItem && vvest_show_weapons)
+		{
+			if(!right_holster_weapon)
+			{
+				switch(vvest_right_holster_model)
+				{
+					case 1:
+						right_holster_weapon = Actor.Spawn("PlaceHolder_SMG", RightHolsterPos);
+						break;
+					case 2:
+						right_holster_weapon = Actor.Spawn("PlaceHolder_Knife", RightHolsterPos);
+						break;
+					case 3:
+						right_holster_weapon = Actor.Spawn("PlaceHolder_Machete", RightHolsterPos);
+						break;
+					default:
+						right_holster_weapon = Actor.Spawn("PlaceHolder_Pistol", RightHolsterPos);
+						break;
+				}
+			}
+			right_holster_weapon.A_SetAngle(pmo.Angle);
+			right_holster_weapon.SetOrigin(RightHolsterPos, true);
+		}
+		
+		//checking proximity of the right holster with main hand position
+		
+		Vector3 drm = RightHolsterPos - AttackPos;
+		if(abs(drm.x) < 3 && abs(drm.y) < 3 && abs(drm.z) < 3)
+		{
+			right_holster_ring.SetStateLabel("Highlight");
+			
+			if(vvest_messages)
+			{
+				if(RightHolsterItem)
+					pmo.A_Print(string.format("Grab %s", RightHolsterItem.GetTag()));
+				else
+					pmo.A_Print("Right holster");
+			}
+			
+			if(RightHolsterItem && ((owner.player.cmd.buttons & BT_ZOOM) || (owner.player.cmd.buttons & BT_USER4)))
+			{
+				if(right_holster_weapon) right_holster_weapon.destroy();
+				RightHolsterItem = null;
+				RightHolsterPickup = "";
+			}
+			
+			if(!RightHolsterItem && (owner.player.cmd.buttons & BT_USE))
+			{
+				if(Slot2Weapon() && CurrentWeaponAllowed()) //check if it's slot 2 weapon
+				{
+					RightHolsterItem = current_weapon;
+					RightHolsterPickup = current_weapon_class;
+					if(vvest_automatch_models) TryAutoMatchWeaponModel('holster_right');
+				}
+			}
+			else if(RightHolsterItem && owner.player.cmd.buttons & BT_USE)
+			{
+				owner.player.pendingWeapon = Weapon(pmo.FindInventory(RightHolsterPickup));
+			}
+		}
+		else
+		{
+			right_holster_ring.SetStateLabel("Idle");
+		}
+		
+		//check proximity of left shoulder with main hand position
+		
+		Vector3 dlsm = LeftShoulderPos - AttackPos;
+		if(abs(dlsm.x) < 4 && abs(dlsm.y) < 4 && abs(dlsm.z) < 9)
+		{
+			if(vvest_messages)
+			{
+				if(LeftShoulderItem)
+					pmo.A_Print(string.format("Grab %s", LeftShoulderItem.GetTag()));
+				else
+					pmo.A_Print("Left Shoulder");
+			}
+			
+			if(LeftShoulderItem && ((owner.player.cmd.buttons & BT_ZOOM) || (owner.player.cmd.buttons & BT_USER4)))
+			{
+				LeftShoulderItem = null;
+				LeftShoulderPickup = "";
+				pmo.A_Print("Left Shoulder Weapon Removed");
+			}
+			
+			if(!LeftShoulderItem && (owner.player.cmd.buttons & BT_USE))
+			{
+				if(!Slot2Weapon() && CurrentWeaponAllowed()) //check if it's not small arms
+				{
+					LeftShoulderItem = current_weapon;
+					LeftShoulderPickup = current_weapon_class;
+				}
+			}
+			else if(LeftShoulderItem && owner.player.cmd.buttons & BT_USE)
+			{
+				owner.player.pendingWeapon = Weapon(pmo.FindInventory(LeftShoulderPickup));
+			}
+		}
+		
+		//check proximity of right shoulder with main hand position
+		
+		Vector3 drsm = RightShoulderPos - AttackPos;
+		if(abs(drsm.x) < 4 && abs(drsm.y) < 4 && abs(drsm.z) < 9)
+		{
+			if(vvest_messages)
+			{
+				if(RightShoulderItem)
+					pmo.A_Print(string.format("Grab %s", RightShoulderItem.GetTag()));
+				else
+					pmo.A_Print("Right Shoulder");
+			}
+			
+			if(RightShoulderItem && ((owner.player.cmd.buttons & BT_ZOOM) || (owner.player.cmd.buttons & BT_USER4)))
+			{
+				RightShoulderItem = null;
+				RightShoulderPickup = "";
+				pmo.A_Print("Right Shoulder Weapon Removed");
+			}
+			
+			if(!RightShoulderItem && (owner.player.cmd.buttons & BT_USE))
+			{
+				if(!Slot2Weapon() && CurrentWeaponAllowed()) //check if it's not small arms
+				{
+					RightShoulderItem = current_weapon;
+					RightShoulderPickup = current_weapon_class;
+				}
+			}
+			else if(RightShoulderItem && (owner.player.cmd.buttons & BT_USE))
+			{
+				owner.player.pendingWeapon = Weapon(pmo.FindInventory(RightShoulderPickup));
+			}
+		}
+		
+		//Spawning rifle slot marker
+		
+		if(!vest_rifle_slot)
+		{
+			if(!vvest_hide_slots && !vvest_show_weapons)
+				vest_rifle_slot = Actor.Spawn("PlaceHolder_Sphere2", vest_pos_rifle);
+			else
+				vest_rifle_slot = Actor.Spawn("PlaceHolder_Sphere", vest_pos_rifle);
+		}
+		vest_rifle_slot.SetOrigin(vest_pos_rifle, true);
+		
+		//Show dummy weapon when slot in use
+		
+		if(AssaultGunItem && vvest_show_weapons)
+		{
+			if(!assault_weapon)
+			{
+				switch(vvest_assaultgun_model)
+				{
+					case 1:
+						assault_weapon = Actor.Spawn("PlaceHolder_Shotgun", vest_pos_rifle);
+						break;
+					case 2:
+						assault_weapon = Actor.Spawn("PlaceHolder_SSG", vest_pos_rifle);
+						break;
+					default:
+						assault_weapon = Actor.Spawn("PlaceHolder_Rifle", vest_pos_rifle);
+						break;
+				}
+			}
+			assault_weapon.A_SetAngle(pmo.Angle);
+			assault_weapon.SetOrigin(vest_pos_rifle, true);
+		}
+		
+		//Checking rifle slot proximity with main hand position
+		
+		Vector3 drs = vest_pos_rifle - AttackPos;
+		if(abs(drs.x) < 2 && abs(drs.y) < 2 && abs(drs.z) < 2)
+		{
+			vest_rifle_slot.SetStateLabel("Highlight");
+			
+			if(vvest_messages)
+			{
+				if(AssaultGunItem)
+					pmo.A_Print(string.format("Grab %s", AssaultGunItem.GetTag()));
+				else
+					pmo.A_Print("Vest slot");
+			}
+			
+			if(AssaultGunItem && ((owner.player.cmd.buttons & BT_ZOOM) || (owner.player.cmd.buttons & BT_USER4)))
+			{
+				if(assault_weapon) assault_weapon.destroy();
+				AssaultGunItem = null;
+				AssaultGunPickup = "";
+			}
+			
+			if(!AssaultGunItem && (owner.player.cmd.buttons & BT_USE))
+			{
+				if((Slot3Weapon() || Slot4Weapon()) && CurrentWeaponAllowed()) //check if it's slot 3 or 4 weapon
+				{
+					AssaultGunItem = current_weapon;
+					AssaultGunPickup = current_weapon_class;
+					if(vvest_automatch_models) TryAutoMatchWeaponModel('vest');
+				}
+			}
+			else if(AssaultGunItem && owner.player.cmd.buttons & BT_USE)
+			{
+				owner.player.pendingWeapon = Weapon(pmo.FindInventory(AssaultGunPickup));
+			}
+		}
+		else
+		{
+			vest_rifle_slot.SetStateLabel("Idle");
+		}
+		
+		if(vvest_cig_slot)
+		{
+			//Spawning cigarette slot marker
+			
+			if(!vest_cig_slot)
+			{
+				if(!vvest_hide_slots && !vvest_show_weapons)
+					vest_cig_slot = Actor.Spawn("PlaceHolder_Sphere2", vest_pos_cig);
+				else
+					vest_cig_slot = Actor.Spawn("PlaceHolder_Sphere", vest_pos_cig);
+			}
+			vest_cig_slot.SetOrigin(vest_pos_cig, true);
+			
+			//Show cigarette pack
+			
+			if(vvest_show_weapons)
+			{
+				if(!vest_cig_pack) vest_cig_pack = Actor.Spawn("PlaceHolder_CigPack", vest_pos_cig);
+				vest_cig_pack.A_SetAngle(pmo.Angle);
+				vest_cig_pack.SetOrigin(vest_pos_cig, true);
+			}
+			
+			//Checking cigarette slot proximity with main hand position
+			
+			Vector3 dcs = vest_pos_cig - AttackPos;
+			if(abs(dcs.x) < 2 && abs(dcs.y) < 2 && abs(dcs.z) < 2)
+			{ 
+				vest_cig_slot.SetStateLabel("Highlight");
+				
+				if(vvest_messages) pmo.A_Print("Grab a smoke");
+			
+				if(owner.player.cmd.buttons & BT_USE)
+				{
+					pmo.SetInventory("Cigarette", 1);
+					owner.player.PendingWeapon = Weapon(pmo.FindInvenTory("Cigarette"));
+				}
+			}
+			else
+			{
+				vest_cig_slot.SetStateLabel("Idle");
+			}
+		}
+		
+		if(vvest_grenade_slot)
+		{
+			//Spawning grenade slot marker
+			
+			if(!vest_grenade_slot)
+			{
+				if(!vvest_hide_slots && !vvest_show_weapons)
+					vest_grenade_slot = Actor.Spawn("PlaceHolder_Sphere2", vest_pos_grenade);
+				else
+					vest_grenade_slot = Actor.Spawn("PlaceHolder_Sphere", vest_pos_grenade);
+			}
+			vest_grenade_slot.SetOrigin(vest_pos_grenade, true);
+			
+			//Show dummy grenade
+
+			if(vvest_show_weapons)
+			{
+				if(!GrenadeItem) GrenadeItem = Actor.Spawn("PlaceHolder_Grenade", vest_pos_grenade);
+				GrenadeItem.A_SetAngle(pmo.Angle);
+				GrenadeItem.SetOrigin(vest_pos_grenade, true);
+			}
+			
+			//Checking grenade slot proximity with main hand position
+			
+			Vector3 dgs = vest_pos_grenade - AttackPos;
+			if(abs(dgs.x) < 2 && abs(dgs.y) < 2 && abs(dgs.z) < 2)
+			{
+				vest_grenade_slot.SetStateLabel("Highlight");
+				
+				if(grenades != "" && vvest_messages) pmo.A_Print(string.format("Grab %s", pmo.FindInvenTory(grenades).GetTag()));
+				
+				if(grenades != "" && (owner.player.cmd.buttons & BT_USE))
+				{
+					owner.player.PendingWeapon = Weapon(pmo.FindInvenTory(grenades));
+					if(!RightHolsterItem && slot2_weapons.Find(current_weapon_class) != slot2_weapons.Size())
+					{
+						RightHolsterItem = current_weapon;
+						RightHolsterPickup = current_weapon_class;
+					}
+				}
+			}
+			else
+			{
+				vest_grenade_slot.SetStateLabel("Idle");
+			}
+		}
+		
+		Super.DoEffect();
+	}
+	
+	void FindVestWeapons()
+	{	
+		int num_classes = AllActorClasses.Size();
+
+		PlayerInfo plr = players[consolePlayer];
+
+		for (int i = 0; i < num_classes; ++i)
+		{
+			let type = (class<Weapon>)(AllActorClasses[i]);
+
+			if (type == NULL || type == "Weapon") continue;
+
+			bool located;
+			int  slot;
+			int  priority;
+			[located, slot, priority] = plr.weapons.LocateWeapon(type);
+
+			if (!located) continue;
+
+			readonly<Weapon> def = GetDefaultByType(type);
+			if (!def.CanPickup(plr.mo)) continue;
+
+			int slot2_priority, slot3_priority;
+			
+			if(type && plr.mo.FindInventory(type))
+			{
+				String weapon_class_name = plr.mo.FindInventory(type).GetClassName();
+				
+				//find slot 2 weapons
+				if(slot == 2)
+				{
+					if(slot2_weapons.Size() == 0 || slot2_weapons.Find(weapon_class_name) == slot2_weapons.Size())
+						slot2_weapons.push(weapon_class_name);
+				}
+				
+				//find slot 3 weapons
+				if(slot == 3)
+				{
+					if(slot3_weapons.Size() == 0 || slot3_weapons.Find(weapon_class_name) == slot3_weapons.Size())
+						slot3_weapons.push(weapon_class_name);
+				}
+				
+				//find slot 4 weapons
+				if(slot == 4)
+				{
+					if(weapon_class_name.IndexOf("chaingun") == -1 && weapon_class_name.IndexOf("Chaingun") == -1 && weapon_class_name.IndexOf("minigun") == -1 && weapon_class_name.IndexOf("Minigun") == -1 && (slot4_weapons.Size() == 0 ||  slot4_weapons.Find(weapon_class_name) == slot4_weapons.Size()))
+						slot4_weapons.push(weapon_class_name);
+				}
+				
+				//Find grenades
+				Array<String> explosive_class = {
+					"Satchel", "satchel",
+					"Dynamite", "dynamite",
+					"Pipebomb", "pipebomb", "Bomb", "bomb"
+				};
+			
+				for(int i=0; i < explosive_class.Size(); i++)
+				{
+					if(weapon_class_name.IndexOf(explosive_class[i]) != -1)
+						grenades = weapon_class_name;
+				}
+				if((weapon_class_name.IndexOf("Grenade") || weapon_class_name.IndexOf("grenade")) && weapon_class_name.IndexOf("launcher") == -1 && weapon_class_name.IndexOf("Launcher") == -1) grenades = weapon_class_name;
+			}
+		}
+	}
+	
+	Bool Slot2Weapon()
+	{
+		if(owner.player.ReadyWeapon)
+		{
+			String current_weapon_class = owner.player.ReadyWeapon.GetClassName();
+			
+			Array<String> banned_weapons = {
+				"Fist", "fist",
+				"Melee", "melee",
+				"Punch", "punch",
+				"Saw", "saw"
+			};
+			
+			Array<String> allowed_weapons = {
+				"Handgun", "handgun",
+				"Pistol", "pistol",
+				"Knife", "knife",
+				"Dagger", "dagger",
+				"Machete", "machete"
+			};
+			
+			for(int i=0; i < banned_weapons.Size(); i++)
+			{
+				if(current_weapon_class.IndexOf(banned_weapons[i]) != -1)
+					return false;
+			}
+			
+			for(int i=0; i < allowed_weapons.Size(); i++)
+			{
+				if(current_weapon_class.IndexOf(allowed_weapons[i]) != -1)
+					return true;
+			}
+			
+			return (slot2_weapons.Find(current_weapon_class) != slot2_weapons.Size());
+		}
+		return false;
+	}
+	
+	Bool Slot3Weapon()
+	{
+		if(owner.player.ReadyWeapon)
+		{
+			String current_weapon_class = owner.player.ReadyWeapon.GetClassName();
+			
+			Array<String> banned_weapons = {
+				"Fist", "fist",
+				"Melee", "melee",
+				"Punch", "punch",
+				"Saw", "saw",
+				"Knife", "knife",
+				"Dagger", "dagger",
+				"Machete", "machete",
+				"Plasma", "plasma"
+			};
+			
+			Array<String> allowed_weapons = {
+				"Shotgun", "shotgun",
+				"Sawn", "sawn",
+				"Sawed", "sawed",
+				"Sawed", "sawed",
+				"SSG", "SSG",
+				"MP40", "mp40",
+				"Rifle", "rifle"
+			};
+			
+			for(int i=0; i < banned_weapons.Size(); i++)
+			{
+				if(current_weapon_class.IndexOf(banned_weapons[i]) != -1)
+					return false;
+			}
+			
+			for(int i=0; i < allowed_weapons.Size(); i++)
+			{
+				if(current_weapon_class.IndexOf(allowed_weapons[i]) != -1)
+					return true;
+			}
+			
+			return (slot3_weapons.Find(current_weapon_class) != slot3_weapons.Size());
+		}
+		return false;
+	}
+	
+	Bool Slot4Weapon()
+	{
+		if(owner.player.ReadyWeapon)
+		{
+			String current_weapon_class = owner.player.ReadyWeapon.GetClassName();
+			
+			return (slot4_weapons.Find(owner.player.ReadyWeapon.GetClassName()) != slot4_weapons.Size());
+		}
+		return false;
+	}
+	
+	Bool CurrentWeaponAllowed()
+	{
+		Bool weapon_allowed;
+		weapon_allowed = true;
+		
+		if(owner.player.ReadyWeapon)
+		{
+			String current_weapon_class = owner.player.ReadyWeapon.GetClassName();
+			
+			Array<String> banned_weapons = {
+				"Fist", "fist",
+				"Melee", "melee",
+				"Punch", "punch",
+				"Cigarette"
+			};
+			
+			for(int i=0; i < banned_weapons.Size(); i++)
+			{
+				if(current_weapon_class.IndexOf(banned_weapons[i]) != -1)
+					return false;
+			}
+		}
+		else
+		{
+			weapon_allowed = false;
+		}
+		
+		return weapon_allowed;		
+	}
+	
+	Void TryAutoMatchWeaponModel(String slot)
+	{		
+		Array<String> smg_class = {
+			"SMG", "Smg", "smg",
+			"SubMachineGun", "SubMachinegun", "Submachinegun", "submachinegun"
+		};
+		
+		Array<String> knife_class = {
+			"Knife", "knife",
+			"Dagger", "dagger"
+		};
+		
+		Array<String> machete_class = {
+			"Machete", "machete",
+			"Hachet", "hachet"
+		};
+		
+		Array<String> ssg_class = {
+			"SSG", "Ssg",
+			"SuperShotgun", "SuperShotGun", "supershotgun",
+			"DoubleBarrel", "Doublebarrel",
+			"SawnOff", "Sawnoff", "SawedOff", "Sawedoff"
+		};
+		
+		Array<String> shotgun_class = {
+			"Shotgun", "ShotGun", "shotgun",
+			"Shot_Gun", "Shot_gun", "shot_gun",
+			"Shotty", "shotty"
+		};
+		
+		String current_weapon_class = owner.player.ReadyWeapon.GetClassName();
+		String replace_model;
+		
+		if(slot == "vest")
+		{	
+			for(int i=0; i < shotgun_class.Size(); i++)
+			{
+				if(current_weapon_class.IndexOf(shotgun_class[i]) != -1)
+				{
+					replace_model = "shotgun";
+					break;
+				}
+			}
+			for(int i=0; i < ssg_class.Size(); i++)
+			{
+				if(current_weapon_class.IndexOf(ssg_class[i]) != -1)
+				{
+					replace_model = "ssg";
+					break;
+				}
+			}		
+			//if(replace_model == "") replace_model = "rifle";
+		}
+		else if(slot == "holster_left" || slot == "holster_right")
+		{
+			for(int i=0; i < smg_class.Size(); i++)
+			{
+				if(current_weapon_class.IndexOf(smg_class[i]) != -1)
+				{
+					replace_model = "smg";
+					break;
+				}
+			}			
+			for(int i=0; i < knife_class.Size(); i++)
+			{
+				if(current_weapon_class.IndexOf(knife_class[i]) != -1)
+				{
+					replace_model = "knife";
+					break;
+				}
+			}		
+			for(int i=0; i < machete_class.Size(); i++)
+			{
+				if(current_weapon_class.IndexOf(machete_class[i]) != -1)
+				{
+					replace_model = "machete";
+					break;
+				}
+			}
+			if(replace_model == "") replace_model = "pistol";
+		}
+		
+		ReplaceWeaponSlotModel(slot, replace_model);
+	}
+	
+	Void ReplaceWeaponSlotModel(String slot, String model)
+	{
+		console.printf("%s, %s", slot, model);
+		if(slot == "vest")
+		{
+			if(assault_weapon) assault_weapon.destroy();
+			if(model == 'shotgun') assault_weapon = Actor.Spawn("PlaceHolder_Shotgun", vest_pos_rifle);
+			if(model == 'ssg') assault_weapon = Actor.Spawn("PlaceHolder_SSG", vest_pos_rifle);
+			if(model == 'rifle') assault_weapon = Actor.Spawn("PlaceHolder_Rifle", vest_pos_rifle);
+		}
+		else if(slot == "holster_left")
+		{
+			if(left_holster_weapon) left_holster_weapon.destroy();
+			if(model == 'smg') left_holster_weapon = Actor.Spawn("PlaceHolder_SMG", LeftHolsterPos);
+			if(model == 'knife') left_holster_weapon = Actor.Spawn("PlaceHolder_Knife", LeftHolsterPos);
+			if(model == 'machete') left_holster_weapon = Actor.Spawn("PlaceHolder_Machete", LeftHolsterPos);
+			if(model == 'pistol') left_holster_weapon = Actor.Spawn("PlaceHolder_Pistol", LeftHolsterPos);
+		}
+		else if(slot == "holster_right")
+		{
+			if(right_holster_weapon) right_holster_weapon.destroy();
+			if(model == 'smg') right_holster_weapon = Actor.Spawn("PlaceHolder_SMG", RightHolsterPos);
+			if(model == 'knife') right_holster_weapon = Actor.Spawn("PlaceHolder_Knife", RightHolsterPos);
+			if(model == 'machete') right_holster_weapon = Actor.Spawn("PlaceHolder_Machete", RightHolsterPos);
+			if(model == 'pistol') right_holster_weapon = Actor.Spawn("PlaceHolder_Pistol", RightHolsterPos);
+		}
+	}
+
+	States
+	{
+	Use:
+		TNT1 A 0;
+		Fail;
+	Pickup:
+		TNT1 A 0
+		{
+			return true;
+		}
+		Stop;
+	}
+}

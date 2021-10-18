@@ -1,0 +1,5 @@
+
+brightmap texture models/cigarette/cigarette_lit.jpg
+{
+   map models/cigarette/cigarette_bm.jpg
+}

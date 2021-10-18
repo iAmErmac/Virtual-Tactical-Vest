@@ -1,0 +1,45 @@
+
+AddOptionMenu "OptionsMenu"
+{
+	StaticText " "
+	Submenu "Virtual Vest Settings", "VVEST_Settings"
+}
+
+OptionMenu "VVEST_Settings" {
+	Title "Virtual Vest Settings"
+	StaticText " "
+	
+	StaticText "Press USE button on a holster or weapon slot to store your current weapon", "DarkGrey"
+	StaticText "Press ZOOM or USER4 button on weapon slot or holster to clear it", "DarkGrey"
+	StaticText "Only Pistol or SMG can be stored in the holsters", "DarkGrey"
+	StaticText "Only Shotgun or Assault Rifle can be stored at the chest", "DarkGrey"
+	StaticText " "
+	StaticText "You'll have to start a new to apply all changes", "DarkGrey"
+	StaticText " "
+	
+	Option "Don't show inactive slots", "vvest_hide_slots", "OnOff"
+	Option "Show holsters", "vvest_show_holsters", "OnOff"
+	Option "Show vest models", "vvest_show_weapons", "OnOff"
+	Option "Grenade", "vvest_grenade_slot", "OnOff"
+	Option "Cigarette", "vvest_cig_slot", "OnOff"
+	StaticText " "
+	StaticText "Decorative options", "Gold"
+	Option "Show slot name/weapon name", "vvest_messages", "OnOff"
+	Option "Left holster weapon model", "vvest_left_holster_model", "Holster_weapon_model", "vvest_show_weapons"
+	Option "Right holster weapon model", "vvest_right_holster_model", "Holster_weapon_model", "vvest_show_weapons"
+	Option "Vest weapon model", "vvest_assaultgun_model", "Vest_weapon_model", "vvest_show_weapons"
+	Option "Try auto-matching weapon models", "vvest_automatch_models", "OnOff", "vvest_show_weapons"
+}
+
+OptionValue "Holster_weapon_model" {
+	0, "Pistol"
+	1, "SMG"
+	2, "Knife"
+	3, "Machete"
+}
+
+OptionValue "Vest_weapon_model" {
+	0, "Assault Rifle"
+	1, "Shotgun"
+	2, "Super Shotgun"
+}

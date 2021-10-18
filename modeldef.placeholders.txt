@@ -1,0 +1,150 @@
+
+Model PlaceHolder_Sphere
+{
+	Path "Models/Placeholder"
+	Model 0 "sphere.md3"
+	Skin 0 "generic.png"
+	
+	Scale 1.0 1.0 1.0
+	Offset 0.0 0.0 0.0
+	
+	FrameIndex SPHR A 0 0
+	Scale 1.3 1.3 1.3
+	Skin 0 "green.png"
+	FrameIndex SPHR B 0 0
+}
+
+Model PlaceHolder_Sphere2
+{
+	Path "Models/Placeholder"
+	Model 0 "sphere.md3"
+	Skin 0 "generic.png"
+	
+	Scale 1.0 1.0 1.0
+	Offset 0.0 0.0 0.0
+	
+	FrameIndex SPHR A 0 0
+	Scale 1.3 1.3 1.3
+	Skin 0 "green.png"
+	FrameIndex SPHR B 0 0
+}
+
+Model PlaceHolder_Knife
+{
+	Path "Models/Placeholder"
+	Model 0 "knife.md3"
+	Skin 0 "generic.png"
+	
+	Scale 1.0 1.0 1.0
+	Offset 0.0 0.0 0.0
+	
+	FrameIndex KNIF A 0 0
+}
+
+Model PlaceHolder_Machete
+{
+	Path "Models/Placeholder"
+	Model 0 "machete.md3"
+	Skin 0 "generic.png"
+	
+	Scale 1.0 1.0 1.0
+	Offset 0.0 0.0 0.0
+	
+	FrameIndex MCHT A 0 0
+}
+
+Model PlaceHolder_Pistol
+{
+	Path "Models/Placeholder"
+	Model 0 "pistol.md3"
+	Skin 0 "pistol.png"
+	
+	Scale 1.0 1.0 1.0
+	Offset 0.0 0.0 0.0
+	
+	FrameIndex PIST A 0 0
+}
+
+Model PlaceHolder_SMG
+{
+	Path "Models/Placeholder"
+	Model 0 "smg.md3"
+	Skin 0 "generic.png"
+	
+	Scale 1.0 1.0 1.0
+	Offset 0.0 0.0 0.0
+	
+	FrameIndex PIST A 0 0
+}
+
+Model PlaceHolder_Rifle
+{
+	Path "Models/Placeholder"
+	Model 0 "rifle.md3"
+	Skin 0 "generic.png"
+	
+	Scale 1.0 1.0 1.0
+	Offset 0.0 0.0 0.0
+	
+	FrameIndex RIFL A 0 0
+}
+
+Model PlaceHolder_Shotgun
+{
+	Path "Models/Placeholder"
+	Model 0 "shotgun.md3"
+	Skin 0 "generic.png"
+	
+	Scale 1.0 1.0 1.0
+	Offset 0.0 0.0 0.0
+	
+	FrameIndex SHOT A 0 0
+}
+
+Model PlaceHolder_SSG
+{
+	Path "Models/Placeholder"
+	Model 0 "ssg.md3"
+	Skin 0 "generic.png"
+	
+	Scale 1.0 1.0 1.0
+	Offset 0.0 0.0 0.0
+	
+	FrameIndex SSGN A 0 0
+}
+
+Model PlaceHolder_Ammo
+{
+	Path "Models/Placeholder"
+	Model 0 "ammo.md3"
+	Skin 0 "generic.png"
+	
+	Scale 1.0 1.0 1.0
+	Offset 0.0 0.0 0.0
+	
+	FrameIndex MAGZ A 0 0
+}
+
+Model PlaceHolder_Grenade
+{
+	Path "Models/Placeholder"
+	Model 0 "grenade.md3"
+	Skin 0 "generic.png"
+	
+	Scale 1.0 1.0 1.0
+	Offset 0.0 0.0 0.0
+	
+	FrameIndex GRNA A 0 0
+}
+
+Model PlaceHolder_CigPack
+{
+	Path "Models/Placeholder"
+	Model 0 "cigarette_pack.md3"
+	Skin 0 "generic.png"
+	
+	Scale 1.0 1.0 1.0
+	Offset 0.0 0.0 0.0
+	
+	FrameIndex CIGA A 0 0
+}

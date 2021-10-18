@@ -1,0 +1,262 @@
+
+
+Class DummyWeaponActorZ : Actor
+{
+	Default
+	{
+		+GHOST;
+		+THRUGHOST;
+		+FRIENDLY;
+		+NOCLIP;
+		+NOTARGET;
+		+NOGRAVITY;
+		+FLOAT;
+		+NOTONAUTOMAP;
+		+SKYEXPLODE;
+		+NOBLOOD;
+		+NOBLOCKMAP;
+		+DONTSPLASH;
+		-SOLID;
+		
+		radius 1;
+		height 1;
+		speed 0;
+		mass 0;
+		gravity 0;
+		health 9999;
+	}
+	
+	States
+	{
+	Spawn:
+		TNT1 A 1;
+		Stop;
+	}
+}
+
+Class ReferenceDot : DummyWeaponActorZ
+{
+	States
+	{
+	Spawn:
+		TNT1 A 0;
+		TNT1 A 1 A_SpawnParticle("FF 00 00", SPF_FULLBRIGHT, 1, 1, 0, 0, 0, 0);
+		Stop;
+	}
+}
+
+Class holster_ring : DummyWeaponActorZ
+{	
+	States
+	{
+	Spawn:
+	Idle:
+		HLST A 1;
+		Loop;
+	Highlight:
+		HLST B 1 Bright;
+		Loop;
+	}
+}
+
+//Placeholder dummies
+
+Class PlaceHolder_Sphere : DummyWeaponActorZ
+{
+	Default
+	{
+	Scale 0.5;
+	RenderStyle "Add";
+	}
+	
+	States
+	{
+	Spawn:
+	Idle:
+		TNT1 A 1;
+		Loop;
+	Highlight:
+		SPHR B 1 Bright;
+		Loop;
+	}
+}
+
+Class PlaceHolder_Sphere2 : DummyWeaponActorZ
+{
+	Default
+	{
+	Scale 0.5;
+	RenderStyle "Add";
+	}
+	
+	States
+	{
+	Spawn:
+	Idle:
+		SPHR A 1;
+		Loop;
+	Highlight:
+		SPHR B 1 Bright;
+		Loop;
+	}
+}
+
+Class PlaceHolder_Knife : DummyWeaponActorZ
+{
+	Default
+	{
+	Scale 0.35;
+	RenderStyle "Add";
+	}
+	
+	States
+	{
+	Spawn:
+		KNIF A 1;
+		Loop;
+	}
+}
+
+Class PlaceHolder_Machete : DummyWeaponActorZ
+{
+	Default
+	{
+	Scale 0.35;
+	RenderStyle "Add";
+	}
+	
+	States
+	{
+	Spawn:
+		MCHT A 1;
+		Loop;
+	}
+}
+
+Class PlaceHolder_Pistol : DummyWeaponActorZ
+{
+	Default
+	{
+	Scale 0.35;
+	RenderStyle "Add";
+	}
+	
+	States
+	{
+	Spawn:
+		PIST A 1;
+		Loop;
+	}
+}
+
+Class PlaceHolder_SMG : DummyWeaponActorZ
+{
+	Default
+	{
+	Scale 0.4;
+	RenderStyle "Add";
+	}
+	
+	States
+	{
+	Spawn:
+		PIST A 1;
+		Loop;
+	}
+}
+
+Class PlaceHolder_Rifle : DummyWeaponActorZ
+{
+	Default
+	{
+	Scale 0.4;
+	RenderStyle "Add";
+	}
+	
+	States
+	{
+	Spawn:
+		RIFL A 1;
+		Loop;
+	}
+}
+
+Class PlaceHolder_Shotgun : DummyWeaponActorZ
+{
+	Default
+	{
+	Scale 0.4;
+	RenderStyle "Add";
+	}
+	
+	States
+	{
+	Spawn:
+		SHOT A 1;
+		Loop;
+	}
+}
+
+Class PlaceHolder_SSG : DummyWeaponActorZ
+{
+	Default
+	{
+	Scale 0.4;
+	RenderStyle "Add";
+	}
+	
+	States
+	{
+	Spawn:
+		SSGN A 1;
+		Loop;
+	}
+}
+
+Class PlaceHolder_Ammo : DummyWeaponActorZ
+{
+	Default
+	{
+	Scale 0.4;
+	RenderStyle "Add";
+	}
+	
+	States
+	{
+	Spawn:
+		MAGZ A 1;
+		Loop;
+	}
+}
+
+Class PlaceHolder_Grenade : DummyWeaponActorZ
+{
+	Default
+	{
+	Scale 0.4;
+	RenderStyle "Add";
+	}
+	
+	States
+	{
+	Spawn:
+		GRNA A 1;
+		Loop;
+	}
+}
+
+Class PlaceHolder_CigPack : DummyWeaponActorZ
+{
+	Default
+	{
+	Scale 0.4;
+	RenderStyle "Add";
+	}
+	
+	States
+	{
+	Spawn:
+		CIGA A 1;
+		Loop;
+	}
+}

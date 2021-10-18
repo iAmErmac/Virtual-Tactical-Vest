@@ -19,7 +19,7 @@ To download the Virtual Tactical Vest mod click the download button below:
 ## Features
 * 5 tactical vest slots to quickly switch weapons
 * 1 Grenade slot (if grenades available as weapon in the mod)
-* Visible weapon holsters and stored weapon models (generic models are used, appearence can be customized from Virtual Vest Settings)
+* Visible weapon holsters and stored weapon models (mod will try to use near-matched models)
 * Cigarettes to confuse enemies or to smoke and regain health when injured
 
 ## Known Issues
@@ -64,23 +64,32 @@ To install:
 * [Aliens: Eradication](https://www.moddb.com/mods/aliens-eradication-tc)
   - A very almospheric mod about playing as a survivor to fight the Aliens and synthetics. You can get the Aliens VR weapons from [here](https://github.com/iAmErmac/Aliens-Eradication-VR-addon/releases/latest)
 
+* [Doom 64: Retribution](https://www.moddb.com/mods/doom-64-retribution/downloads/doom-64-retribution-version-151)
+  - A re-creation of the Original Doom 64 with more polishes. You can get the Doom 64 VR weapons (made by ajantaju) from [here](https://github.com/ajantaju/br_vr/blob/master/D64Retribution.zip)
+
+* [Brutal Doom 64](https://www.moddb.com/mods/brutal-doom-64/downloads/brutal-doom-64-version-10)
+  - A re-imagination of the Original Doom 64 with Brutal Doom esque gore and weapons. You can get the Brutal Doom 64 VR weapons (made by ajantaju) from [here](https://github.com/ajantaju/br_vr/releases/download/B35/DooM64_BR_WIP.zip)
+
 * [Brutal Wolfenstein](https://www.moddb.com/mods/brutal-wolfenstein-3d/downloads/zmc-bwfinal)
   - A spinoff of the original Wolfenstein 3D campaign with Brutal Doom esque gore and weapons. You can get the Brutal Wolfenstein VR weapons (made by ajantaju) from [here](https://github.com/ajantaju/br_vr/blob/master/VR_ZMC_BrutalWolf.zip)
 
-* [Doom 64: Retribution](https://www.moddb.com/mods/doom-64-retribution/downloads/doom-64-retribution-version-151)
-  - A re-creation of the Original Doom 64 with more polishes. You can get the Doom 64 VR weapons (made by ajantaju) from [here](https://github.com/ajantaju/br_vr/blob/master/D64Retribution.zip)
+* [Robocop Doom](https://mikestoybox.net/2019/03/31/robocop-doom/)
+  - Play as Officer Alex Murphy and regain your humanity while seeking revenge against the criminal scum who killed you. You can get the Robocop VR weapons from [here](https://github.com/iAmErmac/Robocop-Doom-VR-Weapons/releases/latest)
 
 ## Credits
 
 * All the models for the visual elements are made by Ermac
-* ZScript codes for controller tracking and VR interactions written by Ermac
+* ZScript codes for controller tracking and VR interactions are written by Ermac
 
 ## 3D Model credits
 
-* Beretta model: https://sketchfab.com/3d-models/berettalowpoly-c4977b72ed3f47b1964f7acd6bd88ce7
+* Knife model: https://sketchfab.com/3d-models/combat-knife-ab155631f3f24156942da4980f273536
+* Machete model: https://sketchfab.com/3d-models/machete-low-poly-b3197e90df2943c1b47dc6bbaa298b72
+* Pistol model: https://sketchfab.com/3d-models/berettalowpoly-c4977b72ed3f47b1964f7acd6bd88ce7
 * SMG model: https://sketchfab.com/3d-models/low-poly-mp9-f1627581e85749c28a83329c6fb5002d
-* M16A1 Rifle model: https://sketchfab.com/3d-models/m16a1-6c9ab15df350473bb036361c59c953e4
-* Sawn Off Shotgun model: https://sketchfab.com/3d-models/shotgun-647e390633004c97893fbf2ccfd3267b
+* Assault Rifle model: https://sketchfab.com/3d-models/m16a1-6c9ab15df350473bb036361c59c953e4
+* Shotgun model: https://sketchfab.com/3d-models/shotgun-647e390633004c97893fbf2ccfd3267b
+* SuperShotgun model: https://sketchfab.com/3d-models/low-poly-double-barrel-shotgun-9268a86cb1ef470ca5654454fbeea587
 * Grenade model: https://sketchfab.com/3d-models/grenade-low-poly-65386b62b82e41b09e277c960ed7439d
 * Cigarette Pack model: https://sketchfab.com/3d-models/hero-cigar-60be3ebe1e994c55b2f29c8870bad3b3
 * All the weapon models and textures are modified by Ermac

@@ -1,0 +1,6 @@
+version "3.6"
+
+#include "zscript/main_hand.txt"
+#include "zscript/dummy_actors.txt"
+#include "zscript/cigarette.txt"
+#include "zscript/vest_control.txt"
