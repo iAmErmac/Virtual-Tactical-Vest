@@ -1,0 +1,20 @@
+Credits
+=========
+
+* All the visual element models are made by Ermac
+* ZScript codes for controller tracking and VR interactions are written by Ermac
+
+
+3D Model credits
+=================
+
+* Knife model: https://sketchfab.com/3d-models/combat-knife-ab155631f3f24156942da4980f273536
+* Machete model: https://sketchfab.com/3d-models/machete-low-poly-b3197e90df2943c1b47dc6bbaa298b72
+* Pistol model: https://sketchfab.com/3d-models/berettalowpoly-c4977b72ed3f47b1964f7acd6bd88ce7
+* SMG model: https://sketchfab.com/3d-models/low-poly-mp9-f1627581e85749c28a83329c6fb5002d
+* Assault Rifle model: https://sketchfab.com/3d-models/m16a1-6c9ab15df350473bb036361c59c953e4
+* Shotgun model: https://sketchfab.com/3d-models/shotgun-647e390633004c97893fbf2ccfd3267b
+* SuperShotgun model: https://sketchfab.com/3d-models/low-poly-double-barrel-shotgun-9268a86cb1ef470ca5654454fbeea587
+* Grenade model: https://sketchfab.com/3d-models/grenade-low-poly-65386b62b82e41b09e277c960ed7439d
+* Cigarette Pack model: https://sketchfab.com/3d-models/hero-cigar-60be3ebe1e994c55b2f29c8870bad3b3
+* All the weapon models and textures are modified by Ermac
