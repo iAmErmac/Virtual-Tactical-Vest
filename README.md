@@ -80,6 +80,8 @@ To install:
 
 * All the models for the visual elements are made by Ermac
 * ZScript codes for controller tracking and VR interactions are written by Ermac
+* Holster/Weapon slot sounds: Royalty free sound effects from videvo.com
+* Weapon slot clear sound: https://opengameart.org/content/inventory-sound-effects
 
 ## 3D Model credits
 

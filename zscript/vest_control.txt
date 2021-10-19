@@ -68,22 +68,23 @@ Class VRTacticalVestController : CustomInventory
 		+INVENTORY.AUTOACTIVATE;
 	}
 	
+	override void OwnerDied()
+	{
+		if(left_holster_ring) left_holster_ring.destroy();
+		if(right_holster_ring) right_holster_ring.destroy();
+		if(left_holster_weapon) left_holster_weapon.destroy();
+		if(right_holster_weapon) right_holster_weapon.destroy();
+		if(assault_weapon) assault_weapon.destroy();
+		if(vest_rifle_slot) vest_rifle_slot.destroy();
+		if(vest_cig_pack) vest_cig_pack.destroy();
+		if(vest_cig_slot) vest_cig_slot.destroy();
+		if(vest_grenade_slot) vest_grenade_slot.destroy();
+		if(GrenadeItem) GrenadeItem.destroy();
+	}
+	
 	override void DoEffect()
 	{
-		if(!owner || owner.health < 0)
-		{
-			if(left_holster_ring) left_holster_ring.destroy();
-			if(right_holster_ring) right_holster_ring.destroy();
-			if(left_holster_weapon) left_holster_weapon.destroy();
-			if(right_holster_weapon) right_holster_weapon.destroy();
-			if(assault_weapon) assault_weapon.destroy();
-			if(vest_rifle_slot) vest_rifle_slot.destroy();
-			if(vest_cig_pack) vest_cig_pack.destroy();
-			if(vest_cig_slot) vest_cig_slot.destroy();
-			if(vest_grenade_slot) vest_grenade_slot.destroy();
-			if(GrenadeItem) GrenadeItem.destroy();
-			return;
-		}
+		if(!owner || owner.health <= 0) return;
 		
 		//Get a list of compatible weapons for the slots
 		FindVestWeapons();
@@ -130,7 +131,9 @@ Class VRTacticalVestController : CustomInventory
 					left_holster_ring = Actor.Spawn("PlaceHolder_Sphere2", LeftHolsterPos);
 			}
 			else
+			{
 				left_holster_ring = Actor.Spawn("holster_ring", LeftHolsterPos);
+			}
 		}
 		left_holster_ring.master = self;
 		left_holster_ring.A_SetAngle(pmo.angle, 0);
@@ -182,6 +185,7 @@ Class VRTacticalVestController : CustomInventory
 				if(left_holster_weapon) left_holster_weapon.destroy();
 				LeftHolsterItem = null;
 				LeftHolsterPickup = "";
+				PlayWeaponSlotSound(2);
 			}
 			
 			if(!LeftHolsterItem && (owner.player.cmd.buttons & BT_USE))
@@ -191,11 +195,13 @@ Class VRTacticalVestController : CustomInventory
 					LeftHolsterItem = current_weapon;
 					LeftHolsterPickup = current_weapon_class;
 					if(vvest_automatch_models) TryAutoMatchWeaponModel('holster_left');
+					PlayWeaponSlotSound();
 				}
 			}
 			else if(LeftHolsterItem && owner.player.cmd.buttons & BT_USE)
 			{
 				owner.player.pendingWeapon = Weapon(pmo.FindInventory(LeftHolsterPickup));
+				PlayWeaponSlotSound(1);
 			}
 		}
 		else
@@ -215,7 +221,9 @@ Class VRTacticalVestController : CustomInventory
 					right_holster_ring = Actor.Spawn("PlaceHolder_Sphere2", RightHolsterPos);
 			}
 			else
+			{
 				right_holster_ring = Actor.Spawn("holster_ring", RightHolsterPos);
+			}
 		}
 		right_holster_ring.master = self;
 		right_holster_ring.A_SetAngle(pmo.angle, 0);
@@ -267,6 +275,7 @@ Class VRTacticalVestController : CustomInventory
 				if(right_holster_weapon) right_holster_weapon.destroy();
 				RightHolsterItem = null;
 				RightHolsterPickup = "";
+				PlayWeaponSlotSound(2);
 			}
 			
 			if(!RightHolsterItem && (owner.player.cmd.buttons & BT_USE))
@@ -276,11 +285,13 @@ Class VRTacticalVestController : CustomInventory
 					RightHolsterItem = current_weapon;
 					RightHolsterPickup = current_weapon_class;
 					if(vvest_automatch_models) TryAutoMatchWeaponModel('holster_right');
+					PlayWeaponSlotSound();
 				}
 			}
 			else if(RightHolsterItem && owner.player.cmd.buttons & BT_USE)
 			{
 				owner.player.pendingWeapon = Weapon(pmo.FindInventory(RightHolsterPickup));
+				PlayWeaponSlotSound(1);
 			}
 		}
 		else
@@ -305,7 +316,8 @@ Class VRTacticalVestController : CustomInventory
 			{
 				LeftShoulderItem = null;
 				LeftShoulderPickup = "";
-				pmo.A_Print("Left Shoulder Weapon Removed");
+				PlayWeaponSlotSound(2);
+				if(vvest_messages) pmo.A_Print("Left Shoulder Weapon Removed");
 			}
 			
 			if(!LeftShoulderItem && (owner.player.cmd.buttons & BT_USE))
@@ -314,11 +326,13 @@ Class VRTacticalVestController : CustomInventory
 				{
 					LeftShoulderItem = current_weapon;
 					LeftShoulderPickup = current_weapon_class;
+					PlayWeaponSlotSound();
 				}
 			}
 			else if(LeftShoulderItem && owner.player.cmd.buttons & BT_USE)
 			{
 				owner.player.pendingWeapon = Weapon(pmo.FindInventory(LeftShoulderPickup));
+				PlayWeaponSlotSound(1);
 			}
 		}
 		
@@ -339,7 +353,8 @@ Class VRTacticalVestController : CustomInventory
 			{
 				RightShoulderItem = null;
 				RightShoulderPickup = "";
-				pmo.A_Print("Right Shoulder Weapon Removed");
+				PlayWeaponSlotSound(2);
+				if(vvest_messages) pmo.A_Print("Right Shoulder Weapon Removed");
 			}
 			
 			if(!RightShoulderItem && (owner.player.cmd.buttons & BT_USE))
@@ -348,11 +363,13 @@ Class VRTacticalVestController : CustomInventory
 				{
 					RightShoulderItem = current_weapon;
 					RightShoulderPickup = current_weapon_class;
+					PlayWeaponSlotSound();
 				}
 			}
 			else if(RightShoulderItem && (owner.player.cmd.buttons & BT_USE))
 			{
 				owner.player.pendingWeapon = Weapon(pmo.FindInventory(RightShoulderPickup));
+				PlayWeaponSlotSound(1);
 			}
 		}
 		
@@ -410,6 +427,7 @@ Class VRTacticalVestController : CustomInventory
 				if(assault_weapon) assault_weapon.destroy();
 				AssaultGunItem = null;
 				AssaultGunPickup = "";
+				PlayWeaponSlotSound(2);
 			}
 			
 			if(!AssaultGunItem && (owner.player.cmd.buttons & BT_USE))
@@ -419,11 +437,13 @@ Class VRTacticalVestController : CustomInventory
 					AssaultGunItem = current_weapon;
 					AssaultGunPickup = current_weapon_class;
 					if(vvest_automatch_models) TryAutoMatchWeaponModel('vest');
+					PlayWeaponSlotSound();
 				}
 			}
 			else if(AssaultGunItem && owner.player.cmd.buttons & BT_USE)
 			{
 				owner.player.pendingWeapon = Weapon(pmo.FindInventory(AssaultGunPickup));
+				PlayWeaponSlotSound(1);
 			}
 		}
 		else
@@ -508,10 +528,11 @@ Class VRTacticalVestController : CustomInventory
 				if(grenades != "" && (owner.player.cmd.buttons & BT_USE))
 				{
 					owner.player.PendingWeapon = Weapon(pmo.FindInvenTory(grenades));
-					if(!RightHolsterItem && slot2_weapons.Find(current_weapon_class) != slot2_weapons.Size())
+					if(!RightHolsterItem && Slot2Weapon())
 					{
 						RightHolsterItem = current_weapon;
 						RightHolsterPickup = current_weapon_class;
+						PlayWeaponSlotSound();
 					}
 				}
 			}
@@ -800,7 +821,6 @@ Class VRTacticalVestController : CustomInventory
 	
 	Void ReplaceWeaponSlotModel(String slot, String model)
 	{
-		console.printf("%s, %s", slot, model);
 		if(slot == "vest")
 		{
 			if(assault_weapon) assault_weapon.destroy();
@@ -824,6 +844,16 @@ Class VRTacticalVestController : CustomInventory
 			if(model == 'machete') right_holster_weapon = Actor.Spawn("PlaceHolder_Machete", RightHolsterPos);
 			if(model == 'pistol') right_holster_weapon = Actor.Spawn("PlaceHolder_Pistol", RightHolsterPos);
 		}
+	}
+	
+	Void PlayWeaponSlotSound(Int state = 0)
+	{
+		if(state == 1)
+			S_StartSound("weaponslot/out", CHAN_WEAPON, CHANF_UI|CHANF_NOPAUSE, 1.0);
+		else if(state == 2)
+			S_StartSound("weaponslot/clear", CHAN_WEAPON, CHANF_UI|CHANF_NOPAUSE, 1.0);
+		else
+			S_StartSound("weaponslot/in", CHAN_WEAPON, CHANF_UI|CHANF_NOPAUSE, 1.0);
 	}
 
 	States

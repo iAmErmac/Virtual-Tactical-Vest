@@ -1,0 +1,22 @@
+
+$random weaponslot/in  { holster/weaponin1 holster/weaponin2 holster/weaponin3 holster/weaponin4 holster/weaponin5 holster/weaponin6 holster/weaponin7 holster/weaponin8 holster/weaponin9 holster/weaponin10 holster/weaponin11 }
+$limit weaponslot/in 3
+holster/weaponin1		"sounds/holster/holster_in1.ogg"
+holster/weaponin2		"sounds/holster/holster_in2.ogg"
+holster/weaponin3		"sounds/holster/holster_in3.ogg"
+holster/weaponin4		"sounds/holster/holster_in4.ogg"
+holster/weaponin5		"sounds/holster/holster_in5.ogg"
+holster/weaponin6		"sounds/holster/holster_in6.ogg"
+holster/weaponin7		"sounds/holster/holster_in7.ogg"
+holster/weaponin8		"sounds/holster/holster_in8.ogg"
+holster/weaponin9		"sounds/holster/holster_in9.ogg"
+holster/weaponin10		"sounds/holster/holster_in10.ogg"
+holster/weaponin11		"sounds/holster/holster_in11.ogg"
+
+$random weaponslot/out  { holster/weaponout1 holster/weaponout2 holster/weaponout3 holster/weaponout4 }
+holster/weaponout1		"sounds/holster/holster_out1.ogg"
+holster/weaponout2		"sounds/holster/holster_out2.ogg"
+holster/weaponout3		"sounds/holster/holster_out3.ogg"
+holster/weaponout4		"sounds/holster/holster_out4.ogg"
+
+weaponslot/clear "sounds/slot_clear.ogg"
